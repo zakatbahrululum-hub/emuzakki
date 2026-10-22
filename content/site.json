@@ -1,9 +1,11 @@
 {
   "hero": {
+    "gambar": [
+      "/uploads/pasted-image-1792649980989.webp"
+    ],
     "lencana": "e-Muzakki Bahrul Ulum",
     "tajuk": "Selamat Datang,",
-    "subtajuk": "Urus dan semak rekod zakat anda dengan mudah dan selamat.",
-    "gambar": []
+    "subtajuk": "Urus dan semak rekod zakat anda dengan mudah dan selamat."
   },
   "makluman": [
     "🌟 Tunaikan zakat anda untuk menyucikan harta dan jiwa.",
