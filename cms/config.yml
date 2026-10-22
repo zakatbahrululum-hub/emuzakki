@@ -3,7 +3,7 @@
 
 backend:
   name: github
-  repo: annurprosolutions-cell/zakatbahrululum
+  repo: zakatbahrululum-hub/emuzakki
   branch: main
 
 # Gambar dimuat naik ke folder uploads/ dalam repo.
