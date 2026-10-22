@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>e-Muzakki Bahrul Ulum | Sistem Rekod Muzakki</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#115e59">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="e-Muzakki">
+    <meta name="description" content="e-Muzakki Bahrul Ulum - sistem rekod dan semakan pembayaran zakat Muzakki berdaftar.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdfa; /* teal-50 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Takaful Green Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(17, 94, 89, 0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #115e59; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Ticker Animation */
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        .animate-ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 25s linear infinite;
+        }
+
+        /* Hide elements dynamically */
+        .tab-hidden { display: none !important; }
+
+        /* Bottom Nav Safe Area for iOS */
+        .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col pb-safe">
+
+    <!-- OVERLAY LOADING GLOBAL -->
+    <div id="globalLoader" class="fixed inset-0 bg-teal-900/90 z-[70] flex flex-col justify-center items-center backdrop-blur-sm transition-opacity duration-300">
+        <svg class="animate-spin h-12 w-12 text-emerald-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <p class="text-teal-50 font-medium text-lg">Memuatkan Sistem...</p>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: UTAMA (DASHBOARD)                   -->
+    <!-- ========================================== -->
+    <div id="viewHome" class="w-full max-w-lg mx-auto md:max-w-3xl lg:max-w-5xl animate-fade-in-up">
+        
+        <!-- Hero Section (Takaful Green Theme) -->
+        <div class="relative bg-teal-800 pb-12 pt-10 px-6 rounded-b-[2.5rem] shadow-xl overflow-hidden">
+            <!-- Gambar hero (diurus melalui CMS; kosong = tema hijau asal) -->
+            <div id="heroBg" class="absolute inset-0 hidden"></div>
+            <div id="heroOverlay" class="absolute inset-0 hidden bg-gradient-to-b from-teal-900/55 via-teal-900/65 to-teal-900/90"></div>
+            <!-- Background Pattern/Image Overlay -->
+            <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            
+            <div class="relative z-10">
+                <!-- Header (Logo) -->
+                <div class="flex justify-between items-center mb-8">
+                    <img src="https://i.postimg.cc/sxHMhZ84/image.png" alt="Logo" class="h-12 bg-white/10 p-1.5 rounded-xl backdrop-blur-sm shadow-sm">
+                    <div class="w-10 h-10 bg-teal-700/50 rounded-full flex items-center justify-center backdrop-blur text-white border border-teal-600/50 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    </div>
+                </div>
+
+                <!-- Greeting -->
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-900/60 border border-teal-600/50 rounded-full text-xs font-bold text-emerald-300 uppercase tracking-widest mb-3 shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                        <span id="heroLencana">e-Muzakki Bahrul Ulum</span>
+                    </span>
+                    <h1 id="heroTajuk" class="text-3xl font-extrabold text-white mb-2">Selamat Datang,</h1>
+                    <p id="heroSubtajuk" class="text-teal-100/90 text-sm md:text-base font-medium">Urus dan semak rekod zakat anda dengan mudah dan selamat.</p>
+                </div>
+
+                <!-- Floating Card: Jom Zakat Hari Ini -->
+                <div class="mt-8 bg-teal-900/80 backdrop-blur-md border border-teal-600/50 p-5 rounded-[1.5rem] flex flex-row justify-between items-center shadow-xl">
+                    <div>
+                        <p class="text-teal-200 text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                            Pautan Pantas
+                        </p>
+                        <p class="text-white font-bold text-xl">Jom Zakat Hari Ini</p>
+                    </div>
+                    <a id="linkBayar" href="https://bahrululum.edu.my/page/pagedetail.php?schid=579&schname=ZAKAT" target="_blank" rel="noopener" class="bg-emerald-500 hover:bg-emerald-400 text-teal-950 px-5 py-3 rounded-full text-sm font-bold shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2 transform hover:scale-105">
+                        Bayar 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TICKER MAKLUMAN AWAM -->
+        <div class="relative z-20 px-6 -mt-4 mb-4 max-w-lg mx-auto md:max-w-full">
+            <div class="bg-white rounded-full overflow-hidden flex items-center shadow-[0_4px_15px_rgba(17,94,89,0.1)] border border-teal-100">
+                <div class="bg-teal-600 text-white text-xs font-bold px-4 py-2.5 z-10 flex items-center gap-1.5 shadow-[4px_0_10px_rgba(0,0,0,0.1)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-pulse" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>
+                    MAKLUMAN
+                </div>
+                <div class="flex-1 overflow-hidden relative h-9 flex items-center bg-teal-50/50">
+                    <div id="tickerTeks" class="animate-ticker text-teal-800 text-sm font-medium inline-block w-full">
+                        🌟 Tunaikan zakat anda untuk menyucikan harta dan jiwa. &nbsp;&nbsp;&bull;&nbsp;&nbsp; 📢 Peringatan: Bayar zakat sebelum 31 Disember untuk kelayakan rebat cukai pendapatan tahun semasa. &nbsp;&nbsp;&bull;&nbsp;&nbsp; 🕌 Kempen Zakat Bahrul Ulum kini berlangsung. Ayuh menyumbang!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Action Cards -->
+        <div class="px-6 relative z-20 grid grid-cols-2 gap-4">
+            <!-- Card 1: Semak Zakat -->
+            <button onclick="switchTab('search')" class="bg-white p-5 rounded-[1.5rem] shadow-lg shadow-teal-900/5 border border-teal-50 flex flex-col items-start hover:-translate-y-1 transition-transform text-left group">
+                <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                </div>
+                <h3 class="font-bold text-slate-800 text-lg">Semak Zakat</h3>
+                <p class="text-slate-400 text-xs mt-1 font-medium leading-relaxed">Semak sejarah & status.</p>
+            </button>
+            
+            <!-- Card 2: Kalkulator -->
+            <button onclick="openKalkulator()" class="bg-white p-5 rounded-[1.5rem] shadow-lg shadow-teal-900/5 border border-teal-50 flex flex-col items-start hover:-translate-y-1 transition-transform text-left group">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                </div>
+                <h3 class="font-bold text-slate-800 text-lg">Kalkulator</h3>
+                <p class="text-slate-400 text-xs mt-1 font-medium leading-relaxed">Kira anggaran zakat.</p>
+            </button>
+        </div>
+
+        <!-- Perjalanan Zakat (Progress Target) & Impak -->
+        <div class="px-6 mt-8 mb-6">
+            
+            <!-- PROGRESS SASARAN -->
+            <div class="bg-white rounded-[1.5rem] p-6 shadow-sm border border-teal-100/50 mb-6 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-teal-50 rounded-full blur-2xl z-0 pointer-events-none"></div>
+                <h3 class="font-bold text-teal-950 mb-5 flex items-center gap-2 relative z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    Perjalanan Zakat Tahun Ini
+                </h3>
+                
+                <div class="flex justify-between items-end mb-3 relative z-10">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Telah Diterima</p>
+                        <p class="text-2xl font-black text-teal-700" id="statDiterima">RM 0</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Sasaran <span id="labelTahunSasaran">2026</span></p>
+                        <p class="text-xl font-bold text-slate-700" id="statSasaran">RM 100,000</p>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar Linear -->
+                <div class="w-full bg-slate-100 rounded-full h-3.5 mb-2 overflow-hidden relative z-10 shadow-inner">
+                    <div id="progressBar" class="bg-gradient-to-r from-teal-500 to-emerald-400 h-3.5 rounded-full transition-all duration-1000 ease-out shadow-sm" style="width: 0%"></div>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs font-bold relative z-10">
+                    <span id="progressText" class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">0% daripada sasaran</span>
+                    <span class="text-slate-500">Baki: <span id="statBaki" class="text-slate-700">RM 0</span></span>
+                </div>
+            </div>
+
+            <!-- IMPAK ZAKAT UNTUK SEKOLAH -->
+            <div class="mb-8">
+                <h3 class="font-bold text-teal-950 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Impak Zakat Untuk Sekolah
+                </h3>
+
+                <!-- ===== MANFAAT LANGSUNG ===== -->
+                <div class="mb-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="inline-flex items-center gap-1.5 bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm shadow-teal-600/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Manfaat Langsung
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400">Agihan terus kepada asnaf</span>
+                    </div>
+
+                    <!-- Pembayaran Gaji 60 Guru (Asnaf Fisabilillah) -->
+                    <div class="bg-indigo-50/70 p-5 rounded-[1.2rem] border border-indigo-100 flex items-center gap-4 shadow-sm hover:shadow transition-shadow">
+                        <div class="w-14 h-14 shrink-0 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-baseline gap-1.5">
+                                <span id="impakGuru" class="text-2xl font-black text-indigo-900 leading-none">60</span>
+                                <span class="text-sm font-bold text-indigo-900 leading-none">orang guru</span>
+                            </div>
+                            <p id="impakGuruKet" class="text-xs font-bold text-indigo-700/80 leading-snug mt-1.5">Pembayaran gaji guru</p>
+                            <span class="inline-block mt-2 text-[10px] font-bold text-indigo-700 bg-indigo-100 border border-indigo-200 px-2 py-0.5 rounded uppercase tracking-wide" id="impakGuruAsnaf">Asnaf Fisabilillah</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== MANFAAT TIDAK LANGSUNG ===== -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="inline-flex items-center gap-1.5 bg-slate-200 text-slate-700 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                            Manfaat Tidak Langsung
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400">Limpahan manfaat kepada warga sekolah</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- 650 Murid -->
+                        <div class="bg-blue-50/70 p-4 rounded-[1.2rem] border border-blue-100 flex flex-col items-center text-center shadow-sm hover:shadow transition-shadow">
+                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </div>
+                            <span id="impakMurid" class="text-xl font-black text-blue-900 leading-none mb-1">&plusmn;650</span>
+                            <span class="text-xs font-bold text-blue-700/80 leading-tight">Murid Menerima Manfaat</span>
+                        </div>
+
+                        <!-- Program Pendidikan & Kebajikan -->
+                        <div class="bg-amber-50/70 p-4 rounded-[1.2rem] border border-amber-100 flex flex-col items-center text-center justify-center min-h-[110px] shadow-sm hover:shadow transition-shadow">
+                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-2 shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                            </div>
+                            <span id="impakProgram" class="text-[11px] font-bold text-amber-800/80 uppercase leading-tight mt-1 tracking-wide">Program Pendidikan &amp; Kebajikan</span>
+                        </div>
+
+                        <!-- Penyelenggaraan Fasiliti -->
+                        <div class="col-span-2 bg-emerald-50/70 p-4 rounded-[1.2rem] border border-emerald-100 flex items-center gap-3 shadow-sm hover:shadow transition-shadow">
+                            <div class="w-12 h-12 shrink-0 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-inner">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                            </div>
+                            <span id="impakFasiliti" class="text-[11px] font-bold text-emerald-800/80 uppercase leading-tight tracking-wide text-left">Penyelenggaraan Fasiliti Sekolah</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="bg-white rounded-[1.5rem] p-5 shadow-sm border border-teal-100/50">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800">Prestasi Kutipan 5 Tahun</h3>
+                    <span class="text-xs bg-slate-100 text-slate-500 font-bold px-2 py-1 rounded">Total Muzakki: <span id="statTotalPayers" class="text-teal-700">-</span></span>
+                </div>
+                <div class="relative h-48 w-full">
+                    <canvas id="homeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: SEMAKAN (SEARCH)                    -->
+    <!-- ========================================== -->
+    <div id="viewSearch" class="w-full max-w-5xl mx-auto p-4 md:p-8 tab-hidden">
+        
+        <!-- Header & Search Area -->
+        <div class="w-full mb-6 animate-fade-in-up">
+            <!-- Back Button -->
+            <button onclick="switchTab('home')" class="mb-4 inline-flex items-center gap-2 text-teal-700 font-bold text-sm bg-teal-100/50 px-4 py-2 rounded-full hover:bg-teal-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                Kembali
+            </button>
+
+            <div class="bg-white rounded-[2rem] shadow-sm p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-teal-100/60 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+                
+                <div>
+                    <h1 class="text-3xl font-extrabold text-teal-900 tracking-tight">Semakan Zakat</h1>
+                    <p class="text-slate-500 mt-1 font-medium">Sistem carian rekod pembayaran Muzakki berdaftar.</p>
+                </div>
+                
+                <form id="searchForm" class="w-full md:w-auto flex gap-2 relative z-10">
+                    <div class="relative w-full md:w-80">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                        <input type="text" id="searchInput" class="w-full pl-11 pr-4 py-3.5 bg-teal-50/50 border border-teal-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white transition-all font-bold text-teal-900 uppercase placeholder:font-medium placeholder:text-teal-300" placeholder="ID MUZAKKI (Cth: Z20180001)" required autocomplete="off" />
+                    </div>
+                    <button type="submit" id="searchBtn" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3.5 rounded-2xl font-bold transition-colors shadow-md shadow-teal-600/30 flex items-center justify-center min-w-[100px]">
+                        Semak
+                    </button>
+                </form>
+            </div>
+
+            <!-- Error Container -->
+            <div id="errorContainer" class="hidden mt-4 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 flex items-center gap-3 shadow-sm animate-fade-in-up">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span id="errorText" class="font-medium"></span>
+            </div>
+        </div>
+
+        <!-- Result Dashboard Container -->
+        <div id="resultContainer" class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start hidden">
+            
+            <!-- KIRI: Ringkasan Card -->
+            <div class="lg:col-span-4 bg-white rounded-[2rem] shadow-sm border border-teal-100/50 p-8 flex flex-col items-center relative overflow-hidden animate-fade-in-up">
+                <div class="w-full flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold text-teal-900">Ringkasan saya</h2>
+                </div>
+
+                <!-- Circular Visual -->
+                <div class="relative w-40 h-40 flex items-center justify-center mb-6">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#f1f5f9" stroke-width="8" />
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="#0d9488" stroke-width="8" stroke-dasharray="282.7" stroke-dashoffset="50" stroke-linecap="round" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="statTotalTrans" class="text-4xl font-black text-teal-900">00</span>
+                        <span class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-wider">Rekod</span>
+                    </div>
+                    <div id="statStatus" class="absolute -bottom-2 bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+                        Status: -
+                    </div>
+                </div>
+
+                <h3 id="statId" class="text-2xl font-bold text-slate-900 mt-2">ID: -</h3>
+                <p class="text-slate-500 font-medium mb-8">Pematuhan Zakat Tahunan</p>
+
+                <!-- Stats Row -->
+                <div class="w-full grid grid-cols-3 gap-2 text-center mt-auto border-t border-teal-50 pt-6">
+                    <div class="flex flex-col items-center p-2 rounded-2xl bg-teal-50/50">
+                        <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <span id="statTransKecil" class="text-lg font-bold text-slate-800">0</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Transaksi</span>
+                    </div>
+                    <div class="flex flex-col items-center p-2 rounded-2xl bg-amber-50/50">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </div>
+                        <span id="statTahunAktif" class="text-lg font-bold text-slate-800">0</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Thn Aktif</span>
+                    </div>
+                    <div class="flex flex-col items-center p-2 rounded-2xl bg-emerald-50/50">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <span id="statTerkini" class="text-sm font-bold text-slate-800 line-clamp-1">-</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Terkini</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANAN: Senarai Rekod (Takaful Dark Theme) -->
+            <div class="lg:col-span-8 bg-[#004d40] rounded-[2rem] shadow-xl p-6 md:p-8 text-white relative animate-fade-in-up" style="animation-delay: 0.1s;">
+                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] rounded-[2rem] pointer-events-none"></div>
+                
+                <div class="flex justify-between items-end mb-6 relative z-10">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white tracking-wide">Rekod Pembayaran</h2>
+                        <p id="recordCountText" class="text-teal-200 mt-1 font-medium">0 rekod dijumpai</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-teal-200 font-bold uppercase tracking-wider mb-1">Jumlah</p>
+                        <p id="totalAmountText" class="text-2xl font-black text-emerald-400">RM 0.00</p>
+                    </div>
+                </div>
+
+                <div id="recordsList" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar relative z-10">
+                    <!-- Rekod dari JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL KALKULATOR ZAKAT PENDAPATAN          -->
+    <!-- ========================================== -->
+    <div id="kalkulatorModal" class="fixed inset-0 bg-teal-950/80 z-[60] hidden flex-col justify-end md:justify-center items-center backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white w-full max-w-md md:rounded-[2rem] rounded-t-[2rem] shadow-2xl overflow-hidden animate-fade-in-up">
+            
+            <!-- Header Modal -->
+            <div class="bg-teal-800 p-6 flex justify-between items-center text-white relative">
+                <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                        Kalkulator Zakat
+                    </h2>
+                    <p class="text-teal-200 text-sm font-medium mt-1">Zakat Pendapatan (2.5%)</p>
+                </div>
+                <button onclick="closeKalkulator()" class="relative z-10 bg-teal-900/50 hover:bg-teal-900 rounded-full p-2 text-teal-100 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <!-- Input Pendapatan -->
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Pendapatan Kasar Setahun</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 font-bold">RM</span>
+                        <input type="number" id="calcPendapatan" oninput="kiraZakat()" class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-600 focus:outline-none font-bold text-lg text-slate-800 transition-shadow" placeholder="0.00" min="0">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">Gaji, bonus, elaun dan pendapatan lain.</p>
+                </div>
+
+                <!-- Input Perbelanjaan -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Perbelanjaan Asas Setahun</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 font-bold">RM</span>
+                        <input type="number" id="calcPerbelanjaan" oninput="kiraZakat()" class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none font-bold text-lg text-slate-800 transition-shadow" placeholder="0.00" min="0">
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">Tolak perbelanjaan diri, isteri, anak, KWSP dll.</p>
+                </div>
+
+                <!-- Result Card -->
+                <div class="bg-teal-50 rounded-2xl p-5 border border-teal-100">
+                    <div class="flex justify-between items-center mb-3 pb-3 border-b border-teal-200/50">
+                        <span class="text-sm font-semibold text-slate-600">Pendapatan Bersih</span>
+                        <span id="calcBersih" class="font-bold text-slate-800">RM 0.00</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <span class="block text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Zakat Wajib (2.5%)</span>
+                        </div>
+                        <span id="calcZakat" class="text-3xl font-black text-teal-700">RM 0.00</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-[10px] text-slate-400 font-medium">Kalkulator ini adalah anggaran ringkas. Sila rujuk asnaf atau badan amil bertauliah untuk taksiran terperinci dan semakan Nisab semasa.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- LIGHTBOX RESIT ZAKAT                       -->
+    <!-- ========================================== -->
+    <div id="resitLightbox" class="fixed inset-0 bg-teal-950/90 z-[70] hidden flex-col justify-center items-center backdrop-blur-sm p-4">
+        <div class="w-full max-w-lg flex flex-col max-h-[92vh] animate-fade-in-up" onclick="event.stopPropagation()">
+
+            <!-- Bar Atas -->
+            <div class="flex items-center justify-between gap-3 mb-3 text-white">
+                <div class="min-w-0">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-400">Resit Zakat</p>
+                    <p id="resitTajuk" class="font-bold text-lg leading-tight truncate">-</p>
+                </div>
+                <button onclick="closeResit()" aria-label="Tutup" class="shrink-0 bg-teal-800/80 hover:bg-teal-700 border border-teal-600/50 rounded-full p-2.5 text-teal-100 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+
+            <!-- Papar Imej -->
+            <div class="bg-white rounded-[1.5rem] overflow-hidden shadow-2xl flex-1 min-h-0 flex items-center justify-center relative">
+                <!-- Loader -->
+                <div id="resitLoader" class="absolute inset-0 flex flex-col items-center justify-center bg-white z-10">
+                    <svg class="animate-spin h-8 w-8 text-teal-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <p class="text-slate-500 font-semibold text-sm">Memuatkan resit...</p>
+                </div>
+
+                <!-- Ralat -->
+                <div id="resitRalat" class="hidden absolute inset-0 flex-col items-center justify-center bg-white z-10 p-8 text-center">
+                    <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <p class="font-bold text-slate-800 mb-1">Resit tidak dapat dipaparkan</p>
+                    <p class="text-sm text-slate-500 font-medium leading-relaxed">Fail mungkin telah dialih atau tetapan perkongsiannya berubah. Sila rujuk Hotline <span class="font-bold text-teal-700">011-55335082</span>.</p>
+                </div>
+
+                <img id="resitImej" src="" alt="Resit zakat" class="hidden max-w-full max-h-[70vh] object-contain" />
+                <iframe id="resitFrame" title="Resit zakat" src="about:blank" class="hidden w-full h-[70vh] bg-white border-0"></iframe>
+            </div>
+
+            <!-- Butang Muat Turun -->
+            <button id="resitDownloadBtn" onclick="downloadResit()" class="mt-3 w-full bg-emerald-500 hover:bg-emerald-400 text-teal-950 font-bold py-3.5 rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Muat Turun Resit
+            </button>
+            <p class="text-center text-teal-300/70 text-[10px] font-medium mt-2">Ketik di luar kotak untuk tutup</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto pt-8 pb-8 px-4 mb-16 md:mb-0 max-w-lg mx-auto md:max-w-3xl lg:max-w-5xl w-full">
+        <!-- DISCLAIMER REKOD -->
+        <div class="bg-white border border-teal-100 rounded-2xl p-4 flex items-start gap-3 shadow-sm mb-5">
+            <div class="w-9 h-9 shrink-0 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-teal-700 uppercase tracking-widest mb-1">Penafian Rekod</p>
+                <p class="text-xs text-slate-600 font-medium leading-relaxed">
+                    Sila rujuk Hotline Zakat Bahrul Ulum (<a id="disclaimerHotline" href="tel:+601155335082" class="font-bold text-teal-700 hover:text-teal-900 underline decoration-teal-300">011-55335082</a>) jika berlaku percanggahan rekod.
+                </p>
+            </div>
+        </div>
+
+        <p class="text-slate-400 text-xs font-medium tracking-wide text-center">
+            Copyright &copy; by Bahrul Ulum 2026<br>
+            e-Muzakki Bahrul Ulum &mdash; Sistem Rekod Muzakki
+        </p>
+    </footer>
+
+    <!-- BOTTOM NAVIGATION (Mobile App Style) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-around items-center z-40 pb-safe md:hidden shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+        <button onclick="switchTab('home')" id="navHomeBtn" class="flex flex-col items-center gap-1 text-teal-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+            <span class="text-[10px] font-bold">Utama</span>
+        </button>
+        <button onclick="switchTab('search')" id="navSearchBtn" class="flex flex-col items-center gap-1 text-slate-400 hover:text-teal-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <span class="text-[10px] font-bold">Semakan</span>
+        </button>
+    </div>
+
+    <script>
+        // Pangkalan data diakses melalui Google Apps Script sahaja (Sheet tidak diterbitkan ke web)
+        const URL_APPSCRIPT_WEBAPP = 'https://script.google.com/macros/s/AKfycbwnN4vBHvKfgGfIa8bBxGySYuKi1TuNXTBqJq2uuBJx-GJtIUZ9w3bNkKxaoG7bUUiD/exec';
+
+        // Hotline rujukan percanggahan rekod
+        const HOTLINE_ZAKAT = '011-55335082';
+
+        // Global State (Cached Data)
+        let statsData = null;      // { totalPayers, perTahun } dari Apps Script
+        let chartInstance = null;
+        let heroTimer = null;
+        let activePayerId = null;  // ID Muzakki yang sedang dipaparkan
+        let rekodDipapar = [];     // rekod yang sedang dipapar pada senarai
+
+        // Sasaran Kutipan Tahunan
+        let TARGET_KUTIPAN = 100000; // boleh ditukar melalui CMS (content/site.json)
+
+        // PWA Setup (Auto Manifest for "Add to Homescreen")
+        const setupPWA = () => {
+            const iconSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23115e59'/><text x='50%' y='50%' font-family='sans-serif' font-size='250' font-weight='bold' fill='white' dominant-baseline='middle' text-anchor='middle'>Z</text></svg>`;
+            const manifest = {
+                name: "e-Muzakki Bahrul Ulum",
+                short_name: "e-Muzakki",
+                start_url: location.href,
+                display: "standalone",
+                background_color: "#f0fdfa",
+                theme_color: "#115e59",
+                icons: [{ src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconSvg), sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }]
+            };
+            const manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'}));
+            document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestUrl}">`);
+        };
+        setupPWA();
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('ms-MY', { style: 'currency', currency: 'MYR' }).format(amount);
+        }
+
+        // Panggilan GET awam ke Apps Script
+        async function panggilAwam(params) {
+            const res = await fetch(URL_APPSCRIPT_WEBAPP + '?' + new URLSearchParams(params).toString());
+            if (!res.ok) throw new Error('Gagal menghubungi pelayan.');
+            return res.json();
+        }
+
+        // Initialize App (statistik agregat + kandungan CMS)
+        async function initApp() {
+            try {
+                if (!navigator.onLine) throw new Error("Tiada sambungan internet.");
+
+                const [stats, kandungan] = await Promise.all([
+                    panggilAwam({ action: 'stats' }),
+                    ambilKandungan()
+                ]);
+                if (stats.status !== 'success') throw new Error(stats.message || 'Gagal memuat turun data.');
+
+                statsData = stats;
+                if (kandungan) applyKandungan(kandungan);
+                processDashboardStats();
+
+                // Hide Loader smoothly
+                const loader = document.getElementById('globalLoader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.classList.add('hidden'), 300);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('globalLoader').innerHTML = `<p class="text-white text-center font-bold px-6">Gagal memuatkan sistem.<br>Sila pastikan internet anda stabil dan refresh laman ini.</p>`;
+            }
+        }
+
+        // ==========================================
+        // KANDUNGAN CMS (content/site.json, diurus melalui Sveltia CMS)
+        // Jika fail tiada / gagal dimuat, kandungan asal dalam HTML kekal.
+        // ==========================================
+        async function ambilKandungan() {
+            try {
+                const res = await fetch('content/site.json', { cache: 'no-cache' });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Laluan imej yang selamat: https:// atau laluan relatif (skema lain ditolak)
+        function laluanImejSelamat(nilai) {
+            const t = String(nilai == null ? '' : nilai).trim();
+            if (!t) return '';
+            if (/^https:\/\//i.test(t)) return t;
+            if (/^[a-z][a-z0-9+.-]*:/i.test(t) || t.startsWith('//')) return '';
+            return t.replace(/^\/+/, '');
+        }
+
+        function setTeks(id, nilai) {
+            const el = document.getElementById(id);
+            const t = nilai == null ? '' : String(nilai).trim();
+            if (el && t) el.textContent = t;
+        }
+
+        function paparHero(senarai) {
+            const bg = document.getElementById('heroBg');
+            const ov = document.getElementById('heroOverlay');
+            // Terima rentetan ("/uploads/a.webp") atau objek ({ imej: "/uploads/a.webp" })
+            const imej = (Array.isArray(senarai) ? senarai : [])
+                .map(x => laluanImejSelamat(x && typeof x === 'object' ? x.imej : x))
+                .filter(Boolean);
+
+            clearInterval(heroTimer);
+            bg.innerHTML = '';
+            if (!imej.length) {
+                bg.classList.add('hidden');
+                ov.classList.add('hidden');
+                return;
+            }
+
+            imej.forEach((src, i) => {
+                const im = document.createElement('img');
+                im.src = src;
+                im.alt = '';
+                im.loading = i === 0 ? 'eager' : 'lazy';
+                im.className = 'absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ' + (i === 0 ? 'opacity-100' : 'opacity-0');
+                im.onerror = () => { im.style.display = 'none'; };
+                bg.appendChild(im);
+            });
+            bg.classList.remove('hidden');
+            ov.classList.remove('hidden');
+
+            if (imej.length > 1) {
+                let i = 0;
+                heroTimer = setInterval(() => {
+                    const els = bg.children;
+                    els[i].classList.replace('opacity-100', 'opacity-0');
+                    i = (i + 1) % els.length;
+                    els[i].classList.replace('opacity-0', 'opacity-100');
+                }, 5000);
+            }
+        }
+
+        function applyKandungan(c) {
+            const h = c.hero || {};
+            setTeks('heroLencana', h.lencana);
+            setTeks('heroTajuk', h.tajuk);
+            setTeks('heroSubtajuk', h.subtajuk);
+            paparHero(h.gambar);
+
+            if (Array.isArray(c.makluman) && c.makluman.length) {
+                const teks = c.makluman.map(m => String(m).trim()).filter(Boolean).join('  •  ');
+                setTeks('tickerTeks', teks);
+            }
+
+            // Pautan bayar: hanya https
+            const bayar = String(c.pautan_bayar || '').trim();
+            if (/^https:\/\//i.test(bayar)) document.getElementById('linkBayar').href = bayar;
+
+            const sasaran = Number(c.sasaran_kutipan);
+            if (sasaran > 0) TARGET_KUTIPAN = sasaran;
+
+            const i = c.impak || {};
+            setTeks('impakGuru', i.bilangan_guru);
+            setTeks('impakGuruKet', i.keterangan_guru);
+            setTeks('impakGuruAsnaf', i.asnaf_guru);
+            setTeks('impakMurid', i.bilangan_murid);
+            setTeks('impakProgram', i.program);
+            setTeks('impakFasiliti', i.fasiliti);
+
+            const hotline = String((c.penafian || {}).hotline || '').trim();
+            if (/^[0-9+\-\s]{7,20}$/.test(hotline)) {
+                const a = document.getElementById('disclaimerHotline');
+                a.textContent = hotline;
+                a.href = 'tel:' + hotline.replace(/[^0-9+]/g, '').replace(/^0/, '+60');
+            }
+        }
+
+        // Dashboard Logic
+        function processDashboardStats() {
+            const currentYear = new Date().getFullYear().toString(); // e.g. "2026"
+            const yearlyData = (statsData && statsData.perTahun) || {};
+            const totalCurrentYear = yearlyData[currentYear] || 0;
+
+            // Update DOM Total Payers
+            document.getElementById('statTotalPayers').textContent = (statsData && statsData.totalPayers) || 0;
+
+            // --- Logik Progress Sasaran Zakat ---
+            document.getElementById('labelTahunSasaran').textContent = currentYear;
+            document.getElementById('statSasaran').textContent = formatCurrency(TARGET_KUTIPAN);
+            document.getElementById('statDiterima').textContent = formatCurrency(totalCurrentYear);
+            
+            let baki = TARGET_KUTIPAN - totalCurrentYear;
+            if (baki < 0) baki = 0;
+            document.getElementById('statBaki').textContent = formatCurrency(baki);
+            
+            let percent = (totalCurrentYear / TARGET_KUTIPAN) * 100;
+            let displayPercent = percent > 100 ? 100 : percent;
+            
+            // Animate progress bar slightly delayed
+            setTimeout(() => {
+                document.getElementById('progressBar').style.width = displayPercent + '%';
+                document.getElementById('progressText').textContent = percent.toFixed(1) + '% daripada sasaran';
+            }, 500);
+
+            // --- Chart Logic (Get last 5 years) ---
+            const sortedYears = Object.keys(yearlyData).sort().slice(-5);
+            const amounts = sortedYears.map(y => yearlyData[y]);
+
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('homeChart').getContext('2d');
+            
+            // Chart tanpa Paksi-Y (Y-Axis dihilangkan)
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedYears,
+                    datasets: [{
+                        label: 'Kutipan (RM)',
+                        data: amounts,
+                        backgroundColor: '#0d9488', // teal-600
+                        borderRadius: 6,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { display: false }, // HILANGKAN PAKSI Y DI SINI
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        // Navigation Logic
+        function switchTab(tabId) {
+            const vHome = document.getElementById('viewHome');
+            const vSearch = document.getElementById('viewSearch');
+            const navHome = document.getElementById('navHomeBtn');
+            const navSearch = document.getElementById('navSearchBtn');
+
+            if (tabId === 'home') {
+                vHome.classList.remove('tab-hidden');
+                vSearch.classList.add('tab-hidden');
+                // Mobile Nav Active State
+                navHome.classList.replace('text-slate-400', 'text-teal-600');
+                navHome.querySelector('svg').setAttribute('fill', 'currentColor');
+                navSearch.classList.replace('text-teal-600', 'text-slate-400');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                vHome.classList.add('tab-hidden');
+                vSearch.classList.remove('tab-hidden');
+                // Mobile Nav Active State
+                navSearch.classList.replace('text-slate-400', 'text-teal-600');
+                navHome.classList.replace('text-teal-600', 'text-slate-400');
+                navHome.querySelector('svg').setAttribute('fill', 'none');
+                navHome.querySelector('svg').setAttribute('stroke', 'currentColor');
+                navHome.querySelector('svg').setAttribute('stroke-width', '2.5');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Auto focus input
+                setTimeout(() => document.getElementById('searchInput').focus(), 100);
+            }
+        }
+
+        // Kalkulator Zakat Logic
+        function openKalkulator() {
+            const modal = document.getElementById('kalkulatorModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { document.getElementById('calcPendapatan').focus(); }, 100);
+        }
+
+        function closeKalkulator() {
+            const modal = document.getElementById('kalkulatorModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            document.getElementById('calcPendapatan').value = '';
+            document.getElementById('calcPerbelanjaan').value = '';
+            document.getElementById('calcBersih').textContent = 'RM 0.00';
+            document.getElementById('calcZakat').textContent = 'RM 0.00';
+        }
+
+        function kiraZakat() {
+            const pendapatan = parseFloat(document.getElementById('calcPendapatan').value) || 0;
+            const perbelanjaan = parseFloat(document.getElementById('calcPerbelanjaan').value) || 0;
+            
+            const bersih = pendapatan - perbelanjaan;
+            let zakat = 0;
+
+            if (bersih > 0) { zakat = bersih * 0.025; } // Zakat = 2.5%
+
+            document.getElementById('calcBersih').textContent = formatCurrency(bersih > 0 ? bersih : 0);
+            document.getElementById('calcZakat').textContent = formatCurrency(zakat);
+        }
+
+        // Fast Local Search Logic
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const queryId = document.getElementById('searchInput').value.trim().toUpperCase();
+            if (!queryId) return;
+
+            const errCon = document.getElementById('errorContainer');
+            const errTxt = document.getElementById('errorText');
+            const resCon = document.getElementById('resultContainer');
+            
+            errCon.classList.add('hidden');
+            resCon.classList.add('hidden');
+
+            const btn = document.getElementById('searchBtn');
+            const teksBtn = btn.innerHTML;
+            btn.innerHTML = 'Mencari...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
+
+            let foundPayer, userRecords;
+            try {
+                const hasil = await panggilAwam({ action: 'lookup', id: queryId });
+
+                if (hasil.status === 'notfound') {
+                    activePayerId = null;
+                    errTxt.textContent = hasil.message || `ID '${queryId}' tidak dijumpai dalam rekod.`;
+                    errCon.classList.remove('hidden');
+                    return;
+                }
+                if (hasil.status !== 'success') throw new Error(hasil.message || 'Carian gagal.');
+
+                foundPayer = hasil.payer;
+                userRecords = hasil.records || [];
+            } catch (err) {
+                activePayerId = null;
+                errTxt.textContent = err.message || 'Carian gagal. Sila cuba lagi.';
+                errCon.classList.remove('hidden');
+                return;
+            } finally {
+                btn.innerHTML = teksBtn;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75');
+            }
+
+            userRecords.sort((a, b) => parseInt(b.TAHUN || 0) - parseInt(a.TAHUN || 0));
+
+            let totalRM = 0;
+            const yearsSet = new Set();
+            userRecords.forEach(r => {
+                totalRM += parseFloat(r.JUMLAH) || 0;
+                if (r.TAHUN) yearsSet.add(r.TAHUN);
+            });
+
+            // Simpan ID aktif untuk borang hantar resit
+            activePayerId = foundPayer.ID.toUpperCase();
+
+            // Update UI Ringkasan
+            document.getElementById('statId').textContent = `ID: ${foundPayer.ID}`;
+            
+            const badge = document.getElementById('statStatus');
+            badge.textContent = `Status: ${foundPayer.STATUS || '-'}`;
+            if((foundPayer.STATUS || '').toLowerCase() === 'active') {
+                badge.className = "absolute -bottom-2 bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md";
+            } else {
+                badge.className = "absolute -bottom-2 bg-rose-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md";
+            }
+
+            const transCount = userRecords.length;
+            document.getElementById('statTotalTrans').textContent = transCount < 10 ? `0${transCount}` : transCount;
+            document.getElementById('statTransKecil').textContent = transCount;
+            document.getElementById('statTahunAktif').textContent = yearsSet.size;
+            document.getElementById('statTerkini').textContent = transCount > 0 ? userRecords[0].TAHUN : '-';
+
+            // Update UI Rekod List
+            document.getElementById('recordCountText').textContent = `${transCount} rekod dijumpai`;
+            document.getElementById('totalAmountText').textContent = formatCurrency(totalRM);
+
+            const rList = document.getElementById('recordsList');
+            rList.innerHTML = ''; 
+            
+            if (transCount === 0) {
+                rList.innerHTML = `<div class="text-center py-8 bg-[#003d33] rounded-2xl border border-teal-700/50 border-dashed text-teal-300">Tiada rekod pembayaran dijumpai.</div>`;
+            } else {
+                rekodDipapar = userRecords; // rujukan untuk butang resit
+                userRecords.forEach((r, idx) => {
+                    const pautanResit = parseResit(r.RESIT);
+                    const butangResit = pautanResit
+                        ? `<button type="button" onclick="openResitDariIndex(${idx})" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors" title="Lihat resit">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                                Resit
+                           </button>`
+                        : `<span class="text-teal-600/60 text-[10px] font-bold px-2 py-1.5 border border-teal-700/40 border-dashed rounded-lg">Tiada resit</span>`;
+
+                    rList.insertAdjacentHTML('beforeend', `
+                        <div class="bg-[#003d33] hover:bg-[#00332a] transition-colors duration-200 rounded-[1.2rem] p-4 flex items-center justify-between border border-teal-700/50">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-teal-900 w-14 h-14 rounded-xl flex flex-col items-center justify-center border border-teal-700">
+                                    <span class="text-[10px] text-teal-300 font-bold uppercase tracking-wider mb-0.5">Tahun</span>
+                                    <span class="text-lg font-black text-white leading-none">${r.TAHUN}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-0.5">${formatCurrency(parseFloat(r.JUMLAH) || 0)}</h4>
+                                    <div class="text-teal-400 text-xs font-medium flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        ${r.TARIKH_BAYAR || '-'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2 shrink-0">
+                                <div class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Selesai
+                                </div>
+                                ${butangResit}
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            resCon.classList.remove('hidden');
+        });
+
+        // ==========================================
+        // LIGHTBOX RESIT ZAKAT (imej + PDF)
+        // ==========================================
+        let resitAktif = null;
+
+        /**
+         * Kenal pasti jenis & pautan paparan resit.
+         *  - lh3.googleusercontent.com/d/ID  -> imej (<img>)
+         *  - pautan Google Drive lain / PDF   -> pratonton Drive (<iframe>)
+         *  - URL https biasa                  -> imej, atau PDF jika berakhir .pdf
+         */
+        function parseResit(nilai) {
+            const teks = String(nilai == null ? '' : nilai).trim();
+            if (!teks) return null;
+
+            const lh3 = teks.match(/^https:\/\/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/i);
+            if (lh3) return { tipe: 'img', src: teks, id: lh3[1] };
+
+            const m = teks.match(/\/d\/([a-zA-Z0-9_-]{15,})/)
+                   || teks.match(/[?&]id=([a-zA-Z0-9_-]{15,})/)
+                   || teks.match(/^([a-zA-Z0-9_-]{25,})$/);
+            if (m) {
+                return {
+                    tipe: 'pdf',
+                    id: m[1],
+                    src: 'https://drive.google.com/file/d/' + m[1] + '/preview',
+                    download: 'https://drive.google.com/uc?export=download&id=' + m[1]
+                };
+            }
+
+            if (/^https:\/\//i.test(teks)) {
+                return /\.pdf([?#]|$)/i.test(teks)
+                    ? { tipe: 'pdf', src: teks, download: teks }
+                    : { tipe: 'img', src: teks };
+            }
+            return null;
+        }
+
+        function openResitDariIndex(idx) {
+            const r = rekodDipapar[idx];
+            if (!r) return;
+            const tajuk = `Tahun ${r.TAHUN} · ${formatCurrency(parseFloat(r.JUMLAH) || 0)}`;
+            const namaAsas = `resit-zakat-${activePayerId || 'muzakki'}-${r.TAHUN}`;
+            openResit(r.RESIT, tajuk, namaAsas);
+        }
+
+        function openResit(nilai, tajuk, namaAsas) {
+            const resit = parseResit(nilai);
+            if (!resit) return;
+
+            const ext = resit.tipe === 'pdf' ? 'pdf' : 'jpg';
+            resitAktif = Object.assign({ nama: (namaAsas || 'resit-zakat') + '.' + ext }, resit);
+
+            const box    = document.getElementById('resitLightbox');
+            const imej   = document.getElementById('resitImej');
+            const frame  = document.getElementById('resitFrame');
+            const loader = document.getElementById('resitLoader');
+            const ralat  = document.getElementById('resitRalat');
+            const btn    = document.getElementById('resitDownloadBtn');
+
+            document.getElementById('resitTajuk').textContent = tajuk || 'Resit Zakat';
+
+            // Reset keadaan
+            loader.classList.remove('hidden');
+            ralat.classList.add('hidden');
+            ralat.classList.remove('flex');
+            imej.classList.add('hidden');
+            frame.classList.add('hidden');
+            imej.src = '';
+            frame.src = 'about:blank';
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (resit.tipe === 'pdf') {
+                frame.onload = () => {
+                    if (frame.getAttribute('src') === 'about:blank') return;
+                    loader.classList.add('hidden');
+                    frame.classList.remove('hidden');
+                };
+                frame.src = resit.src;
+            } else {
+                imej.onload = () => {
+                    loader.classList.add('hidden');
+                    imej.classList.remove('hidden');
+                };
+                imej.onerror = () => {
+                    loader.classList.add('hidden');
+                    ralat.classList.remove('hidden');
+                    ralat.classList.add('flex');
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                };
+                imej.src = resit.src;
+            }
+
+            box.classList.remove('hidden');
+            box.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // kunci skrol latar
+        }
+
+        function closeResit() {
+            const box = document.getElementById('resitLightbox');
+            box.classList.add('hidden');
+            box.classList.remove('flex');
+            document.getElementById('resitImej').src = '';
+            document.getElementById('resitFrame').src = 'about:blank';
+            document.body.style.overflow = '';
+            resitAktif = null;
+        }
+
+        /**
+         * Muat turun resit tanpa membuka tab baharu.
+         *  - PDF : iframe tersembunyi ke pautan muat turun Drive
+         *          (Drive balas sebagai lampiran, halaman ini tidak berubah).
+         *  - Imej: ambil sebagai blob; sandaran anchor jika disekat CORS.
+         */
+        async function downloadResit() {
+            if (!resitAktif) return;
+
+            if (resitAktif.tipe === 'pdf') {
+                const f = document.createElement('iframe');
+                f.style.display = 'none';
+                f.src = resitAktif.download;
+                document.body.appendChild(f);
+                setTimeout(() => f.remove(), 60000);
+                return;
+            }
+
+            const btn = document.getElementById('resitDownloadBtn');
+            const teksAsal = btn.innerHTML;
+            btn.innerHTML = 'Memuat turun...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(resitAktif.src, { mode: 'cors' });
+                if (!response.ok) throw new Error('Gagal mengambil fail.');
+
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = resitAktif.nama;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
+            } catch (err) {
+                const a = document.createElement('a');
+                a.href = resitAktif.src;
+                a.download = resitAktif.nama;
+                a.rel = 'noopener';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } finally {
+                btn.innerHTML = teksAsal;
+                btn.disabled = false;
+            }
+        }
+
+        // Tutup bila ketik latar belakang
+        document.getElementById('resitLightbox').addEventListener('click', function(e) {
+            if (e.target === this) closeResit();
+        });
+
+        // Tutup dengan kekunci Esc
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('resitLightbox').classList.contains('hidden')) {
+                closeResit();
+            }
+        });
+
+        // Start Fetching Data
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
